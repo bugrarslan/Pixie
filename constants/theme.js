@@ -7,9 +7,9 @@ export const theme = {
         neutral: (opacity) => `rgba(10, 10, 10, ${opacity})`,
     }, 
     fontWeights : {
-        medium: 500,
-        bold: 700,
-        semibold: 600,
+        medium: '500',
+        bold: '700',
+        semibold: '600',
     }, 
     radius : {
         xs: 10,
