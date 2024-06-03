@@ -1,15 +1,39 @@
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
 import { hp, wp } from '../../helpers/common';
+import Categories from '../../components/categories';
+import { apiCall } from '../../api';
+import ImageGrid from '../../components/imageGrid';
 
 export default function HomeScreen() {
     const {top} = useSafeAreaInsets();
     const paddingTop = top > 0 ? top + 10 : 30;
     const [search, setSearch] = useState('');
     const searchInputRef = useRef(null);
+    const [activeCategory, setActiveCategory] = useState(null);
+    const [images, setImages] = useState([]);
+
+    const handleChangeCategory = (category) => {
+        setActiveCategory(category);
+    };
+
+    useEffect(() => {
+        fetchImages();
+    }, [])
+
+    const fetchImages = async (params={page:1}, append=true) => {
+        let res = await apiCall(params);
+        if(res.success && res?.data?.hints){
+            if (append) {
+                setImages([...images, ...res.data.hints]);
+            } else {
+                setImages([...res.data.hints]);
+            }
+        }
+    }
 
     return (
     <View style={[styles.container, {paddingTop}]}>
@@ -55,6 +79,18 @@ export default function HomeScreen() {
                     )
                 }
                 
+            </View>
+
+            {/* categories */}
+            <View style={styles.categories}>
+                <Categories activeCategory={activeCategory} handleChangeCategory={handleChangeCategory}/>
+            </View>
+
+            {/* images with masonry grid */}
+            <View>
+                {
+                    images.length > 0 && <ImageGrid images={images}/>
+                }
             </View>
 
         </ScrollView>
