@@ -22,6 +22,6 @@ export const apiCall = async (params) => {
         const {data} = response;
         return {success: true, data, message: "success"};
     } catch (error) {
-        return {success: false, data: null, message: error.message};
+        return {success: false, message: error.message};
     }
 };

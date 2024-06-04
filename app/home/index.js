@@ -26,11 +26,11 @@ export default function HomeScreen() {
 
     const fetchImages = async (params={page:1}, append=true) => {
         let res = await apiCall(params);
-        if(res.success && res?.data?.hints){
+        if(res.success && res?.data?.hits){
             if (append) {
-                setImages([...images, ...res.data.hints]);
+                setImages([...images, ...res.data.hits]);
             } else {
-                setImages([...res.data.hints]);
+                setImages([...res.data.hits]);
             }
         }
     }
@@ -89,7 +89,7 @@ export default function HomeScreen() {
             {/* images with masonry grid */}
             <View>
                 {
-                    images.length > 0 && <ImageGrid images={images}/>
+                    images.length > 0 && <ImageGrid images={images} />
                 }
             </View>
 
