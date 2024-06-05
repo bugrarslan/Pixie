@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
@@ -7,6 +7,9 @@ import { hp, wp } from '../../helpers/common';
 import Categories from '../../components/categories';
 import { apiCall } from '../../api';
 import ImageGrid from '../../components/imageGrid';
+import {debounce} from 'lodash'
+
+var page = 1;
 
 export default function HomeScreen() {
     const {top} = useSafeAreaInsets();
@@ -24,7 +27,8 @@ export default function HomeScreen() {
         fetchImages();
     }, [])
 
-    const fetchImages = async (params={page:1}, append=true) => {
+    const fetchImages = async (params={page:1}, append=false) => {
+        console.log('params: ', params, append);
         let res = await apiCall(params);
         if(res.success && res?.data?.hits){
             if (append) {
@@ -34,6 +38,25 @@ export default function HomeScreen() {
             }
         }
     }
+
+    const handleSearch = (text) => {
+        setSearch(text);
+        if (text.length > 2) {
+            //search images for this text
+            page = 1;
+            setImages([]);
+            fetchImages({page, q:text});
+        }
+
+        if (text="") {
+            //reset images
+            page = 1;
+            setImages([]);
+            fetchImages({page});
+        }
+    }
+
+    const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
     return (
     <View style={[styles.container, {paddingTop}]}>
@@ -61,8 +84,8 @@ export default function HomeScreen() {
                     <Feather name="search" size={24} color={theme.colors.neutral(0.4)}/>
                 </View>
                 <TextInput
-                    value={search}
-                    onChangeText={(text) => setSearch(text)}
+                    // value={search}
+                    onChangeText={handleTextDebounce}
                     ref={searchInputRef}
                     placeholder="Search for photos..."
                     placeholderTextColor={theme.colors.neutral(0.2)}
