@@ -89,85 +89,86 @@ export default function HomeScreen() {
 
     const resetFilters = () => {
         console.log('reset filters');
+        setFilters(null);
         closeFiltersModal();
     }
-
-    
  
     const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
+    console.log('filters: ', filters);
+
     return (
-    <View style={[styles.container, {paddingTop}]}>
-        
-        {/* header */}
-        <View style={styles.header}>
-            <Pressable>
-                <Text style={styles.title}>
-                    App Name
-                </Text>
-            </Pressable>
-            <Pressable
-                onPress={openFiltersModal}
+        <View style={[styles.container, {paddingTop}]}>
+            
+            {/* header */}
+            <View style={styles.header}>
+                <Pressable>
+                    <Text style={styles.title}>
+                        App Name
+                    </Text>
+                </Pressable>
+                <Pressable
+                    onPress={openFiltersModal}
+                >
+                    <FontAwesome6 name="bars-staggered" size={22} color={theme.colors.neutral(0.7)}/>
+                </Pressable>
+            </View>
+
+            {/* content */}
+            <ScrollView
+                contentContainerStyle={{gap:15}}
             >
-                <FontAwesome6 name="bars-staggered" size={22} color={theme.colors.neutral(0.7)}/>
-            </Pressable>
-        </View>
-
-        {/* content */}
-        <ScrollView
-            contentContainerStyle={{gap:15}}
-        >
-        
-            {/* searchBar */}
-            <View style={styles.searchBar}>
-                <View style={styles.searchIcon}>
-                    <Feather name="search" size={24} color={theme.colors.neutral(0.4)}/>
+            
+                {/* searchBar */}
+                <View style={styles.searchBar}>
+                    <View style={styles.searchIcon}>
+                        <Feather name="search" size={24} color={theme.colors.neutral(0.4)}/>
+                    </View>
+                    <TextInput
+                        // value={search}
+                        onChangeText={handleTextDebounce}
+                        ref={searchInputRef}
+                        placeholder="Search for photos..."
+                        placeholderTextColor={theme.colors.neutral(0.2)}
+                        style={styles.searchInput}
+                    />
+                    {
+                        search && (
+                            <Pressable
+                                onPress={() => handleTextDebounce("")}
+                                style={styles.closeIcon}
+                            >
+                                <Ionicons name="close" size={24} color={theme.colors.neutral(0.4)}/>
+                            </Pressable>
+                        )
+                    }
+                    
                 </View>
-                <TextInput
-                    // value={search}
-                    onChangeText={handleTextDebounce}
-                    ref={searchInputRef}
-                    placeholder="Search for photos..."
-                    placeholderTextColor={theme.colors.neutral(0.2)}
-                    style={styles.searchInput}
-                />
-                {
-                    search && (
-                        <Pressable
-                            onPress={() => handleTextDebounce("")}
-                            style={styles.closeIcon}
-                        >
-                            <Ionicons name="close" size={24} color={theme.colors.neutral(0.4)}/>
-                        </Pressable>
-                    )
-                }
-                
-            </View>
 
-            {/* categories */}
-            <View style={styles.categories}>
-                <Categories activeCategory={activeCategory} handleChangeCategory={handleChangeCategory}/>
-            </View>
+                {/* categories */}
+                <View style={styles.categories}>
+                    <Categories activeCategory={activeCategory} handleChangeCategory={handleChangeCategory}/>
+                </View>
 
-            {/* images with masonry grid */}
-            <View>
-                {
-                    images.length > 0 && <ImageGrid images={images} />
-                }
-            </View>
+                {/* images with masonry grid */}
+                <View>
+                    {
+                        images.length > 0 && <ImageGrid images={images} />
+                    }
+                </View>
 
-        </ScrollView>
+            </ScrollView>
 
-        {/* filters modal */}
-        <FiltersModal 
-            modalRef={modalRef}
-            filters={filters}
-            setFilters={setFilters}
-            onClose={closeFiltersModal}
-            onApply={applyFilters}
-            onReset={resetFilters}
-        />
-    </View>
+            {/* filters modal */}
+            <FiltersModal 
+                modalRef={modalRef}
+                filters={filters}
+                setFilters={setFilters}
+                onClose={closeFiltersModal}
+                onApply={applyFilters}
+                onReset={resetFilters}
+            />
+        </View>
     )
 }
 

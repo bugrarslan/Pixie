@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useMemo } from 'react'
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { capitilize, hp } from '../helpers/common';
 import { theme } from '../constants/theme';
-import { SectionView, CommonFilterRow } from './filterViews';
+import { SectionView, CommonFilterRow, ColorFilter } from './filterViews';
 import { data } from '../constants/data';
 import { filter } from 'lodash';
 
@@ -17,7 +17,8 @@ const FiltersModal = ({
     onApply,
     onReset 
 }) => {
-    const snapPoints = useMemo(() => ['75%'], []);
+
+    const snapPoints = useMemo(() => ['80%'], []);
 
     return (
         <BottomSheetModal
@@ -50,6 +51,16 @@ const FiltersModal = ({
                             )
                         })
                     }
+
+                    {/* actions */}
+                    <View style={styles.buttons}>
+                        <Pressable style={styles.resetButton} onPress={onReset}>
+                            <Text style={[styles.buttonText, {color: theme.colors.neutral(0.9)}]}>Reset</Text>
+                        </Pressable>
+                        <Pressable style={styles.applyButton} onPress={onApply}>
+                            <Text style={[styles.buttonText, {color: theme.colors.white}]}>Apply</Text>
+                        </Pressable>
+                    </View>
                 </View>
             </BottomSheetView>
         </BottomSheetModal>
@@ -62,7 +73,7 @@ const sections = {
     "order": (props) => <CommonFilterRow {...props} />,
     "orientation": (props) => <CommonFilterRow {...props} />,
     "type": (props) => <CommonFilterRow {...props} />,
-    "colors": (props) => <CommonFilterRow {...props} />
+    "colors": (props) => <ColorFilter {...props} />
 }
 
 
@@ -109,8 +120,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     content: {
-        // flex:1,
-        width: '100%',
+        flex:1,
+        // width: '100%',
         gap: 15,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -120,5 +131,33 @@ const styles = StyleSheet.create({
         fontWeight: theme.fontWeights.semibold,
         color: theme.colors.neutral(0.8),
         marginBottom:5,
+    },
+    buttons: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    applyButton: {
+        flex: 1,
+        backgroundColor: theme.colors.neutral(0.8),
+        padding: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: theme.radius.md,
+        borderCurve: 'continuous',
+    },
+    resetButton: {
+        flex: 1,
+        backgroundColor: theme.colors.neutral(0.03),
+        padding: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: theme.radius.md,
+        borderCurve: 'continuous',
+        borderColor: theme.colors.grayBg,
+        borderWidth: 2,
+    },
+    buttonText: {
+        fontSize: hp(2.2),
     }
 })
