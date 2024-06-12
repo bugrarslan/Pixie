@@ -3,11 +3,20 @@ import React, { useMemo } from 'react'
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
-import { hp } from '../helpers/common';
+import { capitilize, hp } from '../helpers/common';
 import { theme } from '../constants/theme';
-import { OrderView, SectionView } from './filterViews';
+import { SectionView, CommonFilterRow } from './filterViews';
+import { data } from '../constants/data';
+import { filter } from 'lodash';
 
-const FiltersModal = ({modalRef}) => {
+const FiltersModal = ({
+    modalRef,
+    onClose,
+    filters,
+    setFilters,
+    onApply,
+    onReset 
+}) => {
     const snapPoints = useMemo(() => ['75%'], []);
 
     return (
@@ -24,11 +33,18 @@ const FiltersModal = ({modalRef}) => {
                     {
                         Object.keys(sections).map((sectionName, index) => {
                             let sectionView = sections[sectionName];
+                            let title = capitilize(sectionName);
+                            let sectionData = data.filters[sectionName];
                             return (
                                 <View key={sectionName}>
                                     <SectionView
-                                        title={sectionName}
-                                        content={sectionView({})}
+                                        title={title}
+                                        content={sectionView({
+                                            data:sectionData,
+                                            filters,
+                                            setFilters,
+                                            filterName: sectionName
+                                        })}
                                     />
                                 </View>
                             )
@@ -40,11 +56,13 @@ const FiltersModal = ({modalRef}) => {
     )
 }
 
+
+
 const sections = {
-    "order": (props) => <OrderView {...props} />,
-    "orientation": (props) => <OrderView {...props} />,
-    "type": (props) => <OrderView {...props} />,
-    "colors": (props) => <OrderView {...props} />
+    "order": (props) => <CommonFilterRow {...props} />,
+    "orientation": (props) => <CommonFilterRow {...props} />,
+    "type": (props) => <CommonFilterRow {...props} />,
+    "colors": (props) => <CommonFilterRow {...props} />
 }
 
 

@@ -21,6 +21,7 @@ export default function HomeScreen() {
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState(null);
     const [images, setImages] = useState([]);
+    const [filters, setFilters] = useState(null);
 
     useEffect(() => {
         fetchImages();
@@ -80,6 +81,18 @@ export default function HomeScreen() {
     const closeFiltersModal = () => {
         modalRef.current?.close();
     }
+
+    const applyFilters = () => {
+        console.log('apply filters');
+        closeFiltersModal();
+    }
+
+    const resetFilters = () => {
+        console.log('reset filters');
+        closeFiltersModal();
+    }
+
+    
  
     const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
@@ -146,7 +159,14 @@ export default function HomeScreen() {
         </ScrollView>
 
         {/* filters modal */}
-        <FiltersModal modalRef={modalRef}/>
+        <FiltersModal 
+            modalRef={modalRef}
+            filters={filters}
+            setFilters={setFilters}
+            onClose={closeFiltersModal}
+            onApply={applyFilters}
+            onReset={resetFilters}
+        />
     </View>
     )
 }
