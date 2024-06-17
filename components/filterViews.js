@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native"
 import { theme } from "../constants/theme"
 import { capitilize, hp } from "../helpers/common"
+import Animated, { FadeInRight } from "react-native-reanimated"
 
 
 
@@ -8,9 +9,11 @@ export const SectionView = ({title, content}) => {
     return (
         <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>{title}</Text>
-            <View>
+            <Animated.View
+                entering={FadeInRight.delay(500).springify().damping(11)}
+            >
                 {content}
-            </View>
+            </Animated.View>
         </View>
     )
 }

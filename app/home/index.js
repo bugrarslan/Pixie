@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather, FontAwesome6, Ionicons } from '@expo/vector-icons';
@@ -17,11 +17,13 @@ export default function HomeScreen() {
     const paddingTop = top > 0 ? top + 10 : 30;
     const searchInputRef = useRef(null);
     const modalRef = useRef(null);
+    const scrollRef = useRef(null);
 
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState(null);
     const [images, setImages] = useState([]);
     const [filters, setFilters] = useState(null);
+    const [isReached, setIsReached] = useState(false);
 
     useEffect(() => {
         fetchImages();
@@ -44,7 +46,10 @@ export default function HomeScreen() {
         clearSearch();
         setImages([]);
         page = 1;
-        let params = {page};
+        let params = {
+            page,
+            ...filters
+        };
         if (category) params.category = category;
         fetchImages(params, false);
     };
@@ -56,7 +61,7 @@ export default function HomeScreen() {
             page = 1;
             setImages([]);
             setActiveCategory(null);
-            fetchImages({page, q:text}, false);
+            fetchImages({page, q:text, ...filters}, false);
         }
 
         if (text=="") {
@@ -65,7 +70,7 @@ export default function HomeScreen() {
             searchInputRef?.current?.clear();
             setImages([]);
             setActiveCategory(null);
-            fetchImages({page}, false);
+            fetchImages({page, ...filters}, false);
         }
     }
 
@@ -82,27 +87,94 @@ export default function HomeScreen() {
         modalRef.current?.close();
     }
 
+    const clearThisFilter = (filterName) => {
+        let filterz = {...filters};
+        delete filterz[filterName];
+        setFilters(filterz);
+        page = 1;
+        setImages([]);
+        let params = {
+            page,
+            ...filterz
+        };
+        if (activeCategory) params.category = activeCategory;
+        if (search) params.q = search;
+        fetchImages(params, false);
+    }
+
     const applyFilters = () => {
-        console.log('apply filters');
+        if (filters) {
+            page = 1;
+            setImages([]);
+            let params = {
+                page,
+                ...filters
+            };
+            if (activeCategory) params.category = activeCategory;
+            if (search) params.q = search;
+            fetchImages(params, false);
+        }
         closeFiltersModal();
     }
 
     const resetFilters = () => {
-        console.log('reset filters');
-        setFilters(null);
+        if (filters) {
+            page = 1;
+            setFilters(null);
+            setImages([]);
+            let params = {
+                page
+            };
+            if (activeCategory) params.category = activeCategory;
+            if (search) params.q = search;
+            fetchImages(params, false);
+        }
         closeFiltersModal();
+    }
+
+    const handleScroll = (event) => {
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
+        const scrollOffset = event.nativeEvent.contentOffset.y;
+        const bottomPosition = contentHeight - scrollViewHeight;
+
+        if (scrollOffset >= bottomPosition - 1) {
+            if (!isReached) {
+                setIsReached(true);
+                console.log('reached bottom');
+                //fetch more images
+                ++page;
+                let params = {
+                    page,
+                    ...filters
+                };
+                if (activeCategory) params.category = activeCategory;
+                if (search) params.q = search;
+                fetchImages(params, true);
+            }
+        } else if (isReached) {
+            setIsReached(false);
+        }
+    }
+
+    const handleScrollUp = () => {
+        scrollRef?.current?.scrollTo({
+            y:0,
+            animated:true
+        });
     }
  
     const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
-    console.log('filters: ', filters);
+    // console.log('filters: ', filters);
 
     return (
         <View style={[styles.container, {paddingTop}]}>
             
             {/* header */}
+
             <View style={styles.header}>
-                <Pressable>
+                <Pressable onPress={handleScrollUp}>
                     <Text style={styles.title}>
                         App Name
                     </Text>
@@ -116,7 +188,10 @@ export default function HomeScreen() {
 
             {/* content */}
             <ScrollView
+                onScroll={handleScroll}
+                scrollEventThrottle={5} //how often scroll event will fire whiel scrolling (in ms)
                 contentContainerStyle={{gap:15}}
+                ref={scrollRef}
             >
             
                 {/* searchBar */}
@@ -150,11 +225,50 @@ export default function HomeScreen() {
                     <Categories activeCategory={activeCategory} handleChangeCategory={handleChangeCategory}/>
                 </View>
 
+                {/* filters */}
+                {
+                    filters && (
+                        <View>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+                                {
+                                    Object.keys(filters).map((key, index) => {
+                                        return(
+                                            <View key={key} style={styles.filterItem}>
+
+                                                {
+                                                    key == 'colors' ? (
+                                                        <View style={{
+                                                            width: 30,
+                                                            height: 20,
+                                                            borderRadius: 7,
+                                                            backgroundColor: filters[key]
+                                                        }}/>
+                                                    ) : (
+                                                        <Text style={styles.filterItemText}>{filters[key]}</Text>
+                                                    )
+                                                }
+                                                <Pressable style={styles.filterCloseIcon} onPress={()=> clearThisFilter(key)}>
+                                                    <Ionicons name="close" size={14} color={theme.colors.neutral(0.9)}/>
+                                                </Pressable>
+                                            </View>
+                                        )
+                                    })
+                                }
+                            </ScrollView>
+                        </View>
+                    )
+                }
+
                 {/* images with masonry grid */}
                 <View>
                     {
                         images.length > 0 && <ImageGrid images={images} />
                     }
+                </View>
+
+                {/* loading */}
+                <View style={{marginBottom:70, marginTop:images.length>0? 10 : 70}}>
+                    <ActivityIndicator size="large"/>
                 </View>
 
             </ScrollView>
@@ -214,4 +328,26 @@ const styles = StyleSheet.create({
         padding:8,
         borderRadius:theme.radius.sm,
     },
+    filters: {
+        paddingHorizontal:wp(4),
+        gap:10,
+    },
+    filterItem: {
+        backgroundColor:theme.colors.grayBg,
+        padding:3,
+        flexDirection:'row',
+        alignItems:'center',
+        borderRadius:theme.radius.xs,
+        padding:8,
+        gap: 10,
+        paddingHorizontal:10
+    },
+    filterItemText: {
+        fontSize: hp(1.9),
+    },
+    filterCloseIcon: {
+        backgroundColor:theme.colors.neutral(0.2),
+        padding:4,
+        borderRadius: 7,
+    }
 })
