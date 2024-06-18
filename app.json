@@ -13,11 +13,9 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.bugrarslan.wallpaperApp"
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.bugrarslan.wallpaperApp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -33,14 +31,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "84cce414-e706-4736-a9e6-7a73e4c64c8d"
-      }
     }
   }
 }

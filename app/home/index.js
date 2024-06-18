@@ -9,6 +9,7 @@ import { apiCall } from '../../api';
 import ImageGrid from '../../components/imageGrid';
 import {debounce, set} from 'lodash'
 import FiltersModal from '../../components/filtersModal';
+import { useRouter } from 'expo-router';
 
 var page = 1;
 
@@ -18,6 +19,7 @@ export default function HomeScreen() {
     const searchInputRef = useRef(null);
     const modalRef = useRef(null);
     const scrollRef = useRef(null);
+    const router = useRouter();
 
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState(null);
@@ -172,7 +174,6 @@ export default function HomeScreen() {
         <View style={[styles.container, {paddingTop}]}>
             
             {/* header */}
-
             <View style={styles.header}>
                 <Pressable onPress={handleScrollUp}>
                     <Text style={styles.title}>
@@ -262,7 +263,7 @@ export default function HomeScreen() {
                 {/* images with masonry grid */}
                 <View>
                     {
-                        images.length > 0 && <ImageGrid images={images} />
+                        images.length > 0 && <ImageGrid images={images} router={router}/>
                     }
                 </View>
 
