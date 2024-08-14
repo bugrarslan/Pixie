@@ -177,7 +177,7 @@ export default function HomeScreen() {
             <View style={styles.header}>
                 <Pressable onPress={handleScrollUp}>
                     <Text style={styles.title}>
-                        App Name
+                        Pixie
                     </Text>
                 </Pressable>
                 <Pressable

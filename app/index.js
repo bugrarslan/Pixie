@@ -34,13 +34,13 @@ export default function WelcomeScreen() {
                         entering={FadeInDown.delay(400).springify()}
                         style={styles.title}
                     >
-                        App Name
+                        Pixie
                     </Animated.Text>
                     <Animated.Text 
                         entering={FadeInDown.delay(500).springify()}
                         style={styles.punchLine}
                     >
-                        App Slogan
+                        Unleash Your Walls’ Potential
                     </Animated.Text>
                     <Animated.View
                         entering={FadeInDown.delay(600).springify()}
